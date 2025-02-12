@@ -86,6 +86,10 @@ func (c *WatcherApp) watch(ctx context.Context, ns string) error {
 			UpdateFunc: c.updateEndpoints,
 			DeleteFunc: c.deleteEndpoints,
 		})
+		// add watch error
+		informer.Informer().SetWatchErrorHandler(func(r *cache.Reflector, err error) {
+			c.logger.Error("k8s watch error", zap.String("appname", c.appName), elog.FieldErr(err))
+		})
 		// 启动该命名空间里监听
 		go informersFactory.Start(ctx.Done())
 	default:
